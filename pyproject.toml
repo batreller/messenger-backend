@@ -1,0 +1,27 @@
+[tool.poetry]
+name = "backend"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.89.1"
+uvicorn = {extras = ["standard"], version = "^0.20.0"}
+tortoise-orm = {extras = ["asyncpg"], version = "^0.19.2"}
+argon2-cffi = "^21.3.0"
+ruff = "^0.0.221"
+cryptography = "^39.0.0"
+pydantic = "^1.10.4"
+python-jose = {extras = ["cryptography"], version = "^3.3.0"}
+
+[tool.ruff]
+line-length = 88
+select = ["E", "F"]
+ignore = []
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
