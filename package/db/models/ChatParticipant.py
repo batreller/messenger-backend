@@ -5,7 +5,7 @@ from package.db.models.Chat import Chat
 from package.db.models.User import User
 
 
-class ChatParticipant(Model):
+class GroupParticipant(Model):
     chat_id: fields.ForeignKeyRelation[Chat] = fields.ForeignKeyField(
         'models.Chat'
     )
