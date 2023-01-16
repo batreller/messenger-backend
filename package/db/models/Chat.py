@@ -1,11 +1,9 @@
 from tortoise import fields
 from tortoise.models import Model
 
+from package.db.models.mixins.Timestamp import TimestampMixin
 
-class Chat(Model):
+
+class Chat(Model, TimestampMixin):
     id = fields.IntField(pk=True)
     name = fields.CharField(max_length=256)
-
-    created_at = fields.DatetimeField(auto_now_add=True)
-    updated_at = fields.DatetimeField(auto_now=True)
-    updated_at = fields.DatetimeField(auto_now=True)
