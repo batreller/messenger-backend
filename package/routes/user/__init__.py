@@ -6,10 +6,9 @@ from tortoise.expressions import Q
 from package.auth import TokenResponse, auth_injector
 from package.auth.create_access_token import create_access_token
 from package.db.models.User import User
-from package.routes.exceptions.user_exceptions import (user_exists,
-                                                       wrong_credentials)
-from package.routes.inputs.LoginInput import LoginInput
-from package.routes.inputs.RegisterInput import RegisterInput
+from package.routes.exceptions.user_exceptions import user_exists, wrong_credentials
+from package.routes.user.inputs.LoginInput import LoginInput
+from package.routes.user.inputs.RegisterInput import RegisterInput
 
 router = APIRouter(prefix='/user')
 ph = PasswordHasher()

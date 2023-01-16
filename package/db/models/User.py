@@ -11,8 +11,8 @@ class User(Model, TimestampMixin):
     username = fields.CharField(max_length=64, unique=True)
     password = fields.CharField(max_length=2047)
     email = fields.CharField(max_length=255, unique=True)
-    email_confirmed = fields.BooleanField()
-    about = fields.CharField(max_length=64)
+    email_confirmed = fields.BooleanField(default=False)
+    about = fields.CharField(max_length=64, null=True, default=None)
 
     def without_password(self) -> dict[str, Any]:
         as_dict = dict(self.__dict__)
