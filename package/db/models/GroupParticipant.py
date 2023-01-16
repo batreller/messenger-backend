@@ -5,11 +5,11 @@ from package.db.models.Chat import Chat
 from package.db.models.User import User
 
 
-class ChatParticipant(Model):
-    chat_id: fields.ForeignKeyRelation[Chat] = fields.ForeignKeyField(
+class GroupParticipant(Model):
+    chat: fields.ForeignKeyRelation[Chat] = fields.ForeignKeyField(
         'models.Chat'
     )
-    user_id: fields.ForeignKeyRelation[User] = fields.ForeignKeyField(
+    user: fields.ForeignKeyRelation[User] = fields.ForeignKeyField(
         'models.User'
     )
 
