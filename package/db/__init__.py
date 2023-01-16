@@ -12,7 +12,10 @@ def register_db(app: FastAPI) -> None:
             "models": [
                 "package.db.models.User",
                 "package.db.models.Chat",
-                "package.db.models.ChatParticipant"
+                "package.db.models.ChatMessage",
+                "package.db.models.Group",
+                "package.db.models.GroupParticipant",
+                "package.db.models.GroupMessage"
             ]
         },
         generate_schemas=True,
