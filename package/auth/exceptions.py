@@ -1,7 +1,12 @@
-from fastapi import HTTPException, status
+from fastapi import status
 
-credentials_exception = HTTPException(
+from package.exceptions.CustomException import BaseExceptionDetails, CustomException
+
+credentials_exception = CustomException[BaseExceptionDetails](
     status_code=status.HTTP_401_UNAUTHORIZED,
-    detail="Could not validate credentials",
+    details=BaseExceptionDetails(
+        message="Could not validate credentials",
+        code="NOT_AUHORIZED"
+    ),
     headers={"WWW-Authenticate": "Bearer"},
 )
