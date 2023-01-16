@@ -1,3 +1,4 @@
+import argon2
 from argon2 import PasswordHasher
 from fastapi import APIRouter, Depends
 from tortoise.expressions import Q
@@ -49,8 +50,9 @@ async def login(data: LoginInput) -> TokenResponse:
     if predicate is None:
         raise wrong_credentials
 
-    password_matches = ph.verify(predicate.password, data.password)
-    if not password_matches:
+    try:
+        ph.verify(predicate.password, data.password)
+    except argon2.exceptions.VerifyMismatchError:
         raise wrong_credentials
 
     token = create_access_token({
