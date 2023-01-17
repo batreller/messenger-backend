@@ -3,6 +3,7 @@ from fastapi import APIRouter
 from package.routes.user.endpoints import login
 from package.routes.user.endpoints import me
 from package.routes.user.endpoints import register
+from package.routes.user.endpoints import bio
 from package.routes.user.exceptions import user_exists
 from package.routes.user.exceptions import user_exists, wrong_credentials
 from package.routes.user.hasher import ph
@@ -15,3 +16,4 @@ router = APIRouter(prefix='/user')
 router.include_router(register.router)
 router.include_router(login.router)
 router.include_router(me.router)
+router.include_router(bio.router)
