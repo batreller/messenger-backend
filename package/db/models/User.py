@@ -15,6 +15,6 @@ class User(Model, TimestampMixin):
     about = fields.CharField(max_length=64, null=True, default=None)
 
     def without_password(self) -> dict[str, Any]:
-        as_dict = dict(self.__dict__)
-        as_dict.pop('password', as_dict)
+        as_dict = dict(self)
+        del as_dict['password']
         return as_dict
