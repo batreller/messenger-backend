@@ -7,6 +7,8 @@ from package.db.models.mixins.Timestamp import TimestampMixin
 
 
 class ChatMessage(Model, TimestampMixin):
+    id = fields.IntField(pk=True)
+
     chat: fields.ForeignKeyRelation[Chat] = fields.ForeignKeyField(
         'models.Chat'
     )
