@@ -15,11 +15,18 @@ ruff = "^0.0.221"
 cryptography = "^39.0.0"
 pydantic = "^1.10.4"
 python-jose = {extras = ["cryptography"], version = "^3.3.0"}
+aerich = "^0.7.1"
 
 [tool.ruff]
 line-length = 88
 select = ["E", "F"]
 ignore = []
+
+
+[tool.aerich]
+tortoise_orm = "package.db.TORTOISE_ORM"
+location = "./migrations"
+src_folder = "./."
 
 
 [build-system]

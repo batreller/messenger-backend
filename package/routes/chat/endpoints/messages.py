@@ -1,10 +1,9 @@
-from fastapi import APIRouter
-from fastapi import Depends
+from fastapi import APIRouter, Depends
 from tortoise.expressions import Q
 
 from package.auth import auth_injector
 from package.db.models.Chat import Chat
-from package.db.models.ChatMessage import ChatMessage
+from package.db.models.ChatMessage import Message
 from package.db.models.User import User
 from package.routes.chat.exceptions import chat_not_accessible
 from package.routes.chat.inputs.MessagesInput import MessagesInput
@@ -18,10 +17,10 @@ async def get_messages(data: MessagesInput, user: User = Depends(auth_injector))
     if not chat:
         raise chat_not_accessible
 
-    # todo raise here 403 forbidden
+    # TODO: raise here 403 forbidden
     if chat.first_user_id != user.id and chat.second_user_id != user.id:
         raise chat_not_accessible
 
-    all_messages = await ChatMessage.filter(chat_id=data.chat_id).all()
+    all_messages = await Message.filter(chat_id=data.chat_id).all()
 
     return all_messages

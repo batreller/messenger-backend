@@ -1,17 +1,26 @@
+import typing
+from enum import Enum
+
 from tortoise import fields
 from tortoise.models import Model
 
-from package.db.models.User import User
 from package.db.models.mixins.Timestamp import TimestampMixin
+
+if typing.TYPE_CHECKING:
+    from package.db.models.Message import Message
+    from package.db.models.User import User
+
+
+class ChatType(str, Enum):
+    private = 'private'
+    chat_participant = 'group'
 
 
 class Chat(Model, TimestampMixin):
     id = fields.IntField(pk=True)
-    first_user: fields.ForeignKeyRelation[User] = fields.ForeignKeyField(
-        'models.User',
-        related_name='first_user'
-    )
-    second_user: fields.ForeignKeyRelation[User] = fields.ForeignKeyField(
-        'models.User',
-        related_name='second_user'
-    )
+    name = fields.CharField(max_length=255, null=True, required=False)
+    type = fields.CharEnumField(ChatType)
+
+    participants: fields.ManyToManyRelation['User']
+    messages: fields.ReverseRelation['Message']
+

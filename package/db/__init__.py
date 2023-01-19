@@ -3,21 +3,27 @@ from tortoise.contrib.fastapi import register_tortoise
 
 from package.config import config
 
+TORTOISE_ORM = {
+    "connections": {"default": config.db.connection_string},
+    "apps": {
+        "models": {
+            "models": [
+                "package.db.models.Chat",
+                "package.db.models.Message",
+                "package.db.models.ChatParticipant",
+                "package.db.models.User",
+                "aerich.models"
+            ],
+            "default_connection": "default",
+        },
+    },
+}
+
 
 def register_db(app: FastAPI) -> None:
     register_tortoise(
         app,
-        db_url=config.db.connection_string,
-        modules={
-            "models": [
-                "package.db.models.User",
-                "package.db.models.Chat",
-                "package.db.models.ChatMessage",
-                "package.db.models.Group",
-                "package.db.models.GroupParticipant",
-                "package.db.models.GroupMessage"
-            ]
-        },
+        config=TORTOISE_ORM,
         generate_schemas=True,
         add_exception_handlers=True,
     )

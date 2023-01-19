@@ -13,7 +13,7 @@ router = APIRouter()
 
 @router.post('/create')
 async def create(data: CreateInput, user: User = Depends(auth_injector)):
-    # todo may be deleted
+    # TODO: may be deleted
     if data.user_id == user.id:
         raise chat_with_yourself
 
