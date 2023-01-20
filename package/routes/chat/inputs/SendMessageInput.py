@@ -1,6 +1,6 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class SendMessageInput(BaseModel):
-    contents: str
+    contents: str = Field(max_length=2047)
     # TODO: add images
