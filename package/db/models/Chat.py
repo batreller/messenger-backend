@@ -4,7 +4,10 @@ from enum import Enum
 from tortoise import fields
 from tortoise.models import Model
 
+from package.db.BasePublicModel import BasePublicModel
+from package.db.models.Message import PublicMessage
 from package.db.models.mixins.Timestamp import TimestampMixin
+from package.db.PublicBase import PublicBase
 
 if typing.TYPE_CHECKING:
     from package.db.models.Message import Message
@@ -16,7 +19,14 @@ class ChatType(str, Enum):
     group = 'group'
 
 
-class Chat(Model, TimestampMixin):
+class PublicChat(PublicBase):
+    name: str
+    type: ChatType
+    last_message: PublicMessage | None
+
+
+# TODO: Pack the public logic into an abstract class
+class Chat(Model, BasePublicModel[PublicChat], TimestampMixin):
     id = fields.IntField(pk=True)
     name = fields.CharField(max_length=255, null=True, required=False)
     type = fields.CharEnumField(ChatType)
@@ -28,3 +38,13 @@ class Chat(Model, TimestampMixin):
     participants: fields.ManyToManyRelation['User']
     messages: fields.ReverseRelation['Message']
 
+
+    async def public(self) -> PublicChat:
+        last_message = await self.messages.order_by('created_at').first()
+        if last_message is not None:
+            last_message = await last_message.public()
+
+        return PublicChat.parse_obj({
+            "last_message": last_message,
+            **dict(self)
+        })

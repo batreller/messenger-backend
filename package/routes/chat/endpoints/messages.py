@@ -1,16 +1,23 @@
 from fastapi import Depends
+from pydantic import BaseModel
 
-from package.auth import auth_injector
 from package.db.models.Chat import Chat
-from package.injectors.chat_participant_of import chat_participant_of
+from package.db.models.Message import PublicMessage
+from package.routes.chat.dependencies.chat_participant_of import chat_participant_of
 
 
+class MessagesList(BaseModel):
+    messages: list[PublicMessage]
+
+
+# TODO: Paginaton?
 async def messages(
     chat: Chat = Depends(chat_participant_of)
-):
-    # FIXME: Paginaton?
-    # TODO: Maybe we should utilize a propery pydantic model as a typing for the response
-    messages = await chat.messages.all()
-    return {
-        "messages": messages
-    }
+) -> MessagesList:
+    messages = []
+    async for message in chat.messages.all().prefetch_related('author'):
+        messages.append(await message.public())
+
+    return MessagesList(
+        messages=messages
+    )

@@ -12,12 +12,10 @@ from package.routes import auth, chat, user
 app = FastAPI()
 app.add_exception_handler(CustomException, custom_exceptions_handler)
 
+register_db(app)
+
 for route_module in [user, auth, chat]:
     app.include_router(route_module.router)
-
-@app.on_event('startup')
-def connect():
-    register_db(app)
 
 
 if __name__ == "__main__":

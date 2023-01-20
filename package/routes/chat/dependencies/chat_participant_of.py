@@ -6,7 +6,6 @@ from package.db.models.User import User
 from package.routes.chat.exceptions import chat_does_not_exist
 
 
-# TODO: I think I should move these files to the corresponding folders under the routes derictory...
 async def chat_participant_of(
     chat_id: int = Path(),
     user: User = Depends(auth_injector)

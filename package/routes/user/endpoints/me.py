@@ -5,4 +5,4 @@ from package.db.models.User import User
 
 
 async def me(user: User = Depends(auth_injector)):
-    return user.without_password()
+    return user.public()

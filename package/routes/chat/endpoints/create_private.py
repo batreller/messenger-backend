@@ -1,7 +1,7 @@
 from fastapi import Depends
 
 from package.auth import auth_injector
-from package.db.models.Chat import Chat, ChatType
+from package.db.models.Chat import Chat, ChatType, PublicChat
 from package.db.models.User import User
 from package.routes.chat.exceptions import (
     chat_exists,
@@ -11,7 +11,10 @@ from package.routes.chat.exceptions import (
 from package.routes.chat.inputs.CreatePrivateInput import CreatePrivateInput
 
 
-async def create_private(data: CreatePrivateInput, user: User = Depends(auth_injector)):
+async def create_private(
+    data: CreatePrivateInput,
+    user: User = Depends(auth_injector)
+) -> PublicChat:
     if data.with_user_id == user.id:
         raise chat_with_yourself
 
@@ -40,4 +43,4 @@ async def create_private(data: CreatePrivateInput, user: User = Depends(auth_inj
         chat_with_predicate
     )
 
-    return new_chat
+    return await new_chat.public()
