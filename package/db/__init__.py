@@ -24,6 +24,6 @@ def register_db(app: FastAPI) -> None:
     register_tortoise(
         app,
         config=TORTOISE_ORM,
-        generate_schemas=True,
+        generate_schemas=False,
         add_exception_handlers=True,
     )

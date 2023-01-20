@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS "user" (
     "password" VARCHAR(2047) NOT NULL,
     "email" VARCHAR(255) NOT NULL UNIQUE,
     "email_confirmed" BOOL NOT NULL  DEFAULT False,
-    "about" VARCHAR(64)
+    "bio" VARCHAR(64)
 );
 CREATE TABLE IF NOT EXISTS "message" (
     "created_at" TIMESTAMPTZ   DEFAULT CURRENT_TIMESTAMP,

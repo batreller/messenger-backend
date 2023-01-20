@@ -2,6 +2,5 @@ from pydantic import BaseModel
 
 
 class SendMessageInput(BaseModel):
-    chat_id: int
-    text: str
+    contents: str
     # TODO: add images

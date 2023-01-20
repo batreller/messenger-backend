@@ -1,15 +1,9 @@
 from fastapi import APIRouter
 
-from package.routes.user.endpoints import login
-from package.routes.user.endpoints import me
-from package.routes.user.endpoints import register
-from package.routes.user.endpoints import bio
-from package.routes.user.endpoints import chats
+from package.routes.user.endpoints import bio, chats, me
 
 router = APIRouter(prefix='/user')
 
-router.include_router(register.router)
-router.include_router(login.router)
-router.include_router(me.router)
-router.include_router(bio.router)
-router.include_router(chats.router)
+router.add_api_route('/me', me.me, methods=['GET'])
+router.add_api_route('/chats', chats.chats, methods=['GET'])
+router.add_api_route('/bio', bio.bio, methods=['PATCH'])

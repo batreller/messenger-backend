@@ -10,6 +10,7 @@ if typing.TYPE_CHECKING:
     from package.db.models.User import User
 
 
+# TODO: I think it's a good idea to setup a compond key for the chat_id and the id. The only problem is to setup the autoicrement to increment only when needed
 class Message(Model, TimestampMixin):
     id = fields.IntField(pk=True)
     contents = fields.CharField(max_length=2047)

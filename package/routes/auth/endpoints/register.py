@@ -1,17 +1,13 @@
-from fastapi import APIRouter
 from tortoise.expressions import Q
 
 from package.auth import TokenResponse
 from package.auth.create_access_token import create_access_token
 from package.db.models.User import User
-from package.routes.user.exceptions import user_exists
+from package.routes.auth.exceptions import user_exists
 from package.routes.user.hasher import ph
 from package.routes.user.inputs.RegisterInput import RegisterInput
 
-router = APIRouter()
 
-
-@router.post('/register', response_model=TokenResponse)
 async def register(data: RegisterInput) -> TokenResponse:
     predicate = await User.filter(
         Q(username=data.username) | Q(email=data.email)

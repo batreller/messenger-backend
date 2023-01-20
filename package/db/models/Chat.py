@@ -13,13 +13,17 @@ if typing.TYPE_CHECKING:
 
 class ChatType(str, Enum):
     private = 'private'
-    chat_participant = 'group'
+    group = 'group'
 
 
 class Chat(Model, TimestampMixin):
     id = fields.IntField(pk=True)
     name = fields.CharField(max_length=255, null=True, required=False)
     type = fields.CharEnumField(ChatType)
+    creator = fields.ForeignKeyField(
+        'models.User',
+        'created_by_chats'
+    )
 
     participants: fields.ManyToManyRelation['User']
     messages: fields.ReverseRelation['Message']

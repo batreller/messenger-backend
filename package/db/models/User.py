@@ -16,12 +16,12 @@ class User(Model, TimestampMixin):
     password = fields.CharField(max_length=2047)
     email = fields.CharField(max_length=255, unique=True)
     email_confirmed = fields.BooleanField(default=False)
-    about = fields.CharField(max_length=64, null=True, default=None)
+    bio = fields.CharField(max_length=64, null=True, default=None)
 
     chats: fields.ManyToManyRelation['Chat'] = fields.ManyToManyField(
         model_name='models.Chat',
         through='chat_participant',
-        related_name='chats'
+        related_name='participants'
     )
 
     def without_password(self) -> dict[str, Any]:
