@@ -25,7 +25,6 @@ class PublicChat(PublicBase):
     last_message: PublicMessage | None
 
 
-# TODO: Pack the public logic into an abstract class
 class Chat(Model, BasePublicModel[PublicChat], TimestampMixin):
     id = fields.IntField(pk=True)
     name = fields.CharField(max_length=255, null=True, required=False)

@@ -19,8 +19,13 @@ class PublicAuthor(BaseModel):
     username: str
 
 
-class PublicMessage(PublicBase):
+class BasePublicMessage(PublicBase):
     contents: str
+
+class PublicMessage(BasePublicMessage):
+    author_id: int
+
+class PublicMessageWithAuthor(BasePublicMessage):
     author: PublicAuthor
 
 
@@ -29,20 +34,33 @@ class Message(Model, BasePublicModel[PublicMessage], TimestampMixin):
     id = fields.IntField(pk=True)
     contents = fields.CharField(max_length=2047)
 
+    chat_id: int
     chat: fields.ForeignKeyRelation['Chat'] = fields.ForeignKeyField(
         model_name='models.Chat',
         related_name='messages'
     )
+
+    author_id: int
     author: fields.ForeignKeyRelation['User'] = fields.ForeignKeyField(
         model_name='models.User'
     )
 
 
+    class Meta:
+        unique_together = ('id', 'chat_id')
+
+
     async def public(self) -> PublicMessage:
+        data = dict(self)
+        return PublicMessage.construct(**data)
+
+    async def public_with_author(self) -> PublicMessageWithAuthor:
         if isinstance(self.author, QuerySet):
             await self.fetch_related('author')
 
-        return PublicMessage.parse_obj({
+        data = {
             **dict(self),
             "author": self.author
-        })
+        }
+
+        return PublicMessageWithAuthor.construct(**data)

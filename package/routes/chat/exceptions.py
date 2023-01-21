@@ -4,7 +4,7 @@ from package.exceptions.CustomException import CustomException
 from package.exceptions.InvalidData.InvalidDataException import InvalidDataException
 from package.routes.chat.inputs.CreatePrivateInput import CreatePrivateInput
 
-# TODO: I should do something about...
+# TODO: I should do something about this...
 USER_NOT_EXISTS_MESSAGE = "User with given ID does not exist"
 CHAT_EXISTS_MESSAGE = 'A private chat with this person already exists. You can not create another one.'
 CHAT_WITH_YOURSELF_MESSAGE = "You can not create a chat with yourself"

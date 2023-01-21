@@ -16,5 +16,5 @@ router.add_api_route(
     '/{chat_id}/messages', 
     messages.messages,
     methods=['GET'],
-    response_model=messages.MessagesList
+    response_model=messages.MessagesPage
 )
