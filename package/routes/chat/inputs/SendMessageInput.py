@@ -1,7 +1,6 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class SendMessageInput(BaseModel):
-    chat_id: int
-    text: str
-    # todo add images
+    contents: str = Field(max_length=2047)
+    # TODO: add images

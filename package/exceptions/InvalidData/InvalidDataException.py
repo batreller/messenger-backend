@@ -3,16 +3,18 @@ from typing import Generic, Self, TypeVar
 
 from pydantic import BaseModel, Field
 
-from package.exceptions.CustomException import BaseExceptionDetails, CustomException
+from package.exceptions.CustomException import CustomException
 
 BodyFields = TypeVar('BodyFields', bound=BaseModel)
 
 
-class ExceptionDetails(Generic[BodyFields], BaseExceptionDetails):
+class ExceptionDetails(Generic[BodyFields], BaseModel):
     errors: BodyFields | None = Field(default=None)
 
 
 class InvalidDataException(Generic[BodyFields], CustomException[ExceptionDetails]):
+    additional_details: ExceptionDetails
+
     def __init__(
         self,
         status_code: int,
@@ -23,13 +25,11 @@ class InvalidDataException(Generic[BodyFields], CustomException[ExceptionDetails
         if isinstance(field_error_mapping, BaseModel):
             field_error_mapping = field_error_mapping
 
-        self.details = ExceptionDetails(
-            code=code,
-            message=message,
+        additional_details = ExceptionDetails(
             errors=field_error_mapping
         )
 
-        super().__init__(status_code, self.details)
+        super().__init__(status_code, code, message, additional_details)
 
 
 
@@ -43,6 +43,6 @@ class InvalidDataException(Generic[BodyFields], CustomException[ExceptionDetails
 
             errors_mapping[key] = self.details.message
 
-        self.details.errors = typing.cast(BodyFields, errors_mapping)
+        self.additional_details.errors = typing.cast(BodyFields, errors_mapping)
 
         return self

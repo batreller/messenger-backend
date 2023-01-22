@@ -1,8 +1,8 @@
 from fastapi import status
 from pydantic import Field
 
+from package.exceptions.CustomException import CustomException
 from package.exceptions.InvalidData.InvalidDataException import InvalidDataException
-from package.routes.user.inputs.BioInput import BioInput
 from package.routes.user.inputs.LoginInput import LoginInput
 from package.routes.user.inputs.RegisterInput import RegisterInput
 
@@ -13,7 +13,7 @@ class PartialRegister(RegisterInput):
 
 USER_EXISTS_MESSAGE = "This user already exists."
 WRONG_CREDENTIALS_MESSAGE = "Wrong login credential, try again."
-INVALID_BIO_MESSAGE = "Bio is too long"
+ALREADY_AUTH_MESSAGE = 'You are already authenicated. You have to logout first'
 
 user_exists = InvalidDataException[PartialRegister](
     status_code=status.HTTP_400_BAD_REQUEST,
@@ -31,8 +31,8 @@ wrong_credentials = InvalidDataException[LoginInput](
     message=WRONG_CREDENTIALS_MESSAGE
 ).populate_errors_with_message()
 
-invalid_bio = InvalidDataException[BioInput](
-    status_code=status.HTTP_400_BAD_REQUEST,
-    code="INVALID_BIO",
-    message=INVALID_BIO_MESSAGE
-).populate_errors_with_message()
+already_authenticated = CustomException(
+    status_code=status.HTTP_403_FORBIDDEN,
+    code="ALREADY_AUTHENICATED",
+    message=ALREADY_AUTH_MESSAGE
+)

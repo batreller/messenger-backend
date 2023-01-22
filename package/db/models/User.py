@@ -1,20 +1,50 @@
-from typing import Any
+from __future__ import annotations
 
+import typing
+
+from pydantic import BaseModel
 from tortoise import fields
 from tortoise.models import Model
 
+from package.db.BasePublicModel import BasePublicModel
 from package.db.models.mixins.Timestamp import TimestampMixin
+from package.db.PublicBase import PublicBase
+
+if typing.TYPE_CHECKING:
+    from package.db.models.Chat import Chat
 
 
-class User(Model, TimestampMixin):
+class PublicUser(PublicBase):
+    username: str
+    email: str
+    bio: str | None
+    email_confirmed: bool
+
+
+class ShortPublicUser(BaseModel):
+    id: int
+    username: str
+
+
+class User(Model, BasePublicModel[PublicUser], TimestampMixin):
     id = fields.IntField(pk=True)
     username = fields.CharField(max_length=64, unique=True)
     password = fields.CharField(max_length=2047)
     email = fields.CharField(max_length=255, unique=True)
     email_confirmed = fields.BooleanField(default=False)
-    about = fields.CharField(max_length=64, null=True, default=None)
+    bio = fields.CharField(max_length=64, null=True, default=None)
 
-    def without_password(self) -> dict[str, Any]:
+    chats: fields.ManyToManyRelation['Chat'] = fields.ManyToManyField(
+        model_name='models.Chat',
+        through='chat_participant',
+        related_name='participants'
+    )
+
+
+    def public(self) -> PublicUser:
         as_dict = dict(self)
-        del as_dict['password']
-        return as_dict
+        return PublicUser.parse_obj(as_dict)
+
+
+    def short_public(self) -> ShortPublicUser:
+        return ShortPublicUser.construct(**dict(self))

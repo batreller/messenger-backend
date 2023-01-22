@@ -1,27 +1,53 @@
-from fastapi import APIRouter
-from fastapi import Depends
-from tortoise.expressions import Q
+import asyncio
+from typing import Any, Coroutine
 
-from package.auth import auth_injector
+from fastapi import Depends, Query
+from pydantic import BaseModel
+
 from package.db.models.Chat import Chat
-from package.db.models.ChatMessage import ChatMessage
-from package.db.models.User import User
-from package.routes.chat.exceptions import chat_not_accessible
-from package.routes.chat.inputs.MessagesInput import MessagesInput
-
-router = APIRouter()
+from package.db.models.Message import PublicMessage
+from package.db.models.User import ShortPublicUser
+from package.routes.chat.dependencies.chat_participant_of import chat_participant_of
 
 
-@router.get('/messages')
-async def get_messages(data: MessagesInput, user: User = Depends(auth_injector)):
-    chat = await Chat.get_or_none(id=data.chat_id)
-    if not chat:
-        raise chat_not_accessible
+class MessagesPage(BaseModel):
+    count: int
+    authors: list[ShortPublicUser]
+    messages: list[PublicMessage]
 
-    # todo raise here 403 forbidden
-    if chat.first_user_id != user.id and chat.second_user_id != user.id:
-        raise chat_not_accessible
 
-    all_messages = await ChatMessage.filter(chat_id=data.chat_id).all()
+async def messages(
+    chat: Chat = Depends(chat_participant_of),
+    limit: int = Query(default=50, lte=100),
+    id_cursor: int | None = Query(default=None, alias='cursor')
+) -> MessagesPage:
+    messages_query = chat.messages \
+        .order_by('created_at') \
+        .limit(limit)
 
-    return all_messages
+    if id_cursor is not None:
+        messages_query = chat.messages.filter(
+            id__gt=id_cursor
+        )
+
+
+    author_ids = set()
+    tasks: list[Coroutine[Any, Any, PublicMessage]] = []
+    async for message in messages_query:
+        author_ids.add(message.author_id)
+        tasks.append(message.public())
+
+    messages = await asyncio.gather(*tasks)
+    authors = list(map(
+        lambda user: user.short_public(),
+        await chat.participants.filter(
+            id__in=author_ids
+        )
+    ))
+
+
+    return MessagesPage(
+        count=len(messages),
+        authors=authors,
+        messages=messages,
+    )

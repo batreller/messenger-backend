@@ -1,5 +1,5 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class BioInput(BaseModel):
-    bio: str
+    bio: str = Field(max_length=64)
