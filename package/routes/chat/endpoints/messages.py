@@ -5,13 +5,14 @@ from fastapi import Depends, Query
 from pydantic import BaseModel
 
 from package.db.models.Chat import Chat
-from package.db.models.Message import PublicAuthor, PublicMessage
+from package.db.models.Message import PublicMessage
+from package.db.models.User import ShortPublicUser
 from package.routes.chat.dependencies.chat_participant_of import chat_participant_of
 
 
 class MessagesPage(BaseModel):
     count: int
-    authors: list[PublicAuthor]
+    authors: list[ShortPublicUser]
     messages: list[PublicMessage]
 
 
@@ -38,7 +39,7 @@ async def messages(
 
     messages = await asyncio.gather(*tasks)
     authors = list(map(
-        lambda user: user.author(),
+        lambda user: user.short_public(),
         await chat.participants.filter(
             id__in=author_ids
         )

@@ -2,11 +2,11 @@ from __future__ import annotations
 
 import typing
 
+from pydantic import BaseModel
 from tortoise import fields
 from tortoise.models import Model
 
 from package.db.BasePublicModel import BasePublicModel
-from package.db.models.Message import PublicAuthor
 from package.db.models.mixins.Timestamp import TimestampMixin
 from package.db.PublicBase import PublicBase
 
@@ -19,6 +19,11 @@ class PublicUser(PublicBase):
     email: str
     bio: str | None
     email_confirmed: bool
+
+
+class ShortPublicUser(BaseModel):
+    id: int
+    username: str
 
 
 class User(Model, BasePublicModel[PublicUser], TimestampMixin):
@@ -35,9 +40,11 @@ class User(Model, BasePublicModel[PublicUser], TimestampMixin):
         related_name='participants'
     )
 
+
     def public(self) -> PublicUser:
         as_dict = dict(self)
         return PublicUser.parse_obj(as_dict)
 
-    def author(self) -> PublicAuthor:
-        return PublicAuthor.construct(**dict(self))
+
+    def short_public(self) -> ShortPublicUser:
+        return ShortPublicUser.construct(**dict(self))

@@ -7,6 +7,7 @@ from tortoise.models import Model
 from package.db.BasePublicModel import BasePublicModel
 from package.db.models.Message import PublicMessage
 from package.db.models.mixins.Timestamp import TimestampMixin
+from package.db.models.User import ShortPublicUser
 from package.db.PublicBase import PublicBase
 
 if typing.TYPE_CHECKING:
@@ -23,6 +24,10 @@ class PublicChat(PublicBase):
     name: str
     type: ChatType
     last_message: PublicMessage | None
+
+
+class PublicChatWithParticipants(PublicChat):
+    participants: list[ShortPublicUser]
 
 
 class Chat(Model, BasePublicModel[PublicChat], TimestampMixin):
@@ -47,3 +52,19 @@ class Chat(Model, BasePublicModel[PublicChat], TimestampMixin):
             "last_message": last_message,
             **dict(self)
         })
+
+    async def public_with_participants(self) -> PublicChatWithParticipants:
+        simple_public = await self.public()
+
+        participants_data = await self.participants.all()
+        participants = []
+
+        for item in participants_data:
+            participants.append(item.public())
+
+        result = PublicChatWithParticipants.construct(
+            **dict(simple_public),
+            participants=participants
+        )
+
+        return result

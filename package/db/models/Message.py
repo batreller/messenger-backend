@@ -6,6 +6,7 @@ from tortoise.models import Model
 from tortoise.queryset import QuerySet
 
 from package.db.BasePublicModel import BasePublicModel
+from package.db.models.User import ShortPublicUser
 from package.db.models.mixins.Timestamp import TimestampMixin
 from package.db.PublicBase import PublicBase
 
@@ -14,19 +15,15 @@ if typing.TYPE_CHECKING:
     from package.db.models.User import User
 
 
-class PublicAuthor(BaseModel):
-    id: int
-    username: str
-
-
 class BasePublicMessage(PublicBase):
     contents: str
 
 class PublicMessage(BasePublicMessage):
     author_id: int
 
+
 class PublicMessageWithAuthor(BasePublicMessage):
-    author: PublicAuthor
+    author: ShortPublicUser
 
 
 # TODO: I think it's a good idea to setup a compond key for the chat_id and the id. The only problem is to setup the autoicrement to increment only when needed
