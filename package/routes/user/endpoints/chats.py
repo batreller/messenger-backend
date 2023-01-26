@@ -16,7 +16,6 @@ class ChatsPage(BaseModel):
 
 
 def parse_public_chat(data: dict[str, Any]) -> PublicChat:
-
     parse_message = data.get('message_id', None) is not None
     values: dict[str, Any] = {
         "last_message": {} if parse_message else None
@@ -34,7 +33,7 @@ def parse_public_chat(data: dict[str, Any]) -> PublicChat:
 
     return PublicChat.construct(**values)
 
-# TODO: Add pagination
+
 async def chats(
     user: User = Depends(auth_injector),
     time_cursor: datetime = Query(default=datetime.now(), alias='cursor'),
