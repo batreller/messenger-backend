@@ -7,14 +7,14 @@ from package.exceptions.CustomException import (
     CustomException,
     custom_exceptions_handler,
 )
-from package.routes import auth, chat, user
+from package.routes import auth, chat, message, user
 
 app = FastAPI()
 app.add_exception_handler(CustomException, custom_exceptions_handler)
 
 register_db(app)
 
-for route_module in [user, auth, chat]:
+for route_module in [user, auth, chat, message]:
     app.include_router(route_module.router)
 
 
