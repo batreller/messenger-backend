@@ -3,4 +3,4 @@ run:
 docker-up:
 	docker compose up
 test:
-	PYTEST_ENV=true python -m pytest tests/ -s
+	PYTEST_ENV=true python -m pytest tests/
