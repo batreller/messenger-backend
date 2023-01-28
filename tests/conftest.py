@@ -2,11 +2,18 @@ from urllib.parse import urlparse
 
 import asyncpg
 import pytest
+from faker import Faker
 from httpx import AsyncClient
 from tortoise import Tortoise
 
 from package.__main__ import app
 from package.db import TORTOISE_ORM
+
+pytest_plugins = [
+    'tests.fixtures.register_user',
+    'tests.fixtures.login_user',
+    'tests.fixtures.auth_client'
+]
 
 
 async def create_db(db_url: str):
@@ -35,7 +42,6 @@ async def init_db(
 
     if schemas:
         await Tortoise.generate_schemas()
-        print("Success to generate schemas")
 
 
 async def init():
@@ -50,8 +56,13 @@ def anyio_backend():
 @pytest.fixture(scope="session")
 async def client():
     async with AsyncClient(app=app, base_url="http://test") as client:
-        print("Client is ready")
         yield client
+
+
+@pytest.fixture(scope='session')
+async def faker():
+    faker = Faker()
+    yield faker
 
 
 @pytest.fixture(scope="session", autouse=True)
