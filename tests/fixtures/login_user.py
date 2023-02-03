@@ -5,7 +5,7 @@ from httpx import AsyncClient, Response
 from pydantic import BaseModel
 
 from package.routes.user.inputs.LoginInput import LoginInput
-from tests.fixtures.register_user import RegisteredUser
+from tests.fixtures.register_user import RegisterResult
 from tests.shared.ValidatingTokenResponse import ValidatingTokenResponse
 
 
@@ -30,10 +30,10 @@ class LoginRequestor(Protocol):
         ...
 
 
-@pytest.fixture(scope='module')
+@pytest.fixture(scope='class')
 def login_user(
     client: AsyncClient,
-    register_user: RegisteredUser
+    register_user: RegisterResult
 ) -> LoginRequestor:
     async def _send_request(
         differing_field_key: PossibleAccessKey = 'email',

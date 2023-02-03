@@ -17,18 +17,29 @@ pytest_plugins = [
 
 
 async def create_db(db_url: str):
+    data = urlparse(db_url)
+    db = data.path.partition('/')[2]
+    owner = data.netloc.partition('@')[0].partition(':')[0]
+
+    try:
+        conn = await asyncpg.connect(db_url)
+        await conn.execute(
+            f'DROP DATABASE "{db}"'
+        )
+
+        await conn.close()
+    except asyncpg.InvalidCatalogNameError:
+        print(f'{db} database already exists!')
+
     conn = await asyncpg.connect(
         db_url,
         database='template1'
     )
 
-    data = urlparse(db_url)
-    db = data.path.partition('/')[2]
-    owner = data.netloc.partition('@')[0].partition(':')[0]
-
     await conn.execute(
         f'CREATE DATABASE "{db}" OWNER "{owner}"'
     )
+
 
 
 async def init_db(

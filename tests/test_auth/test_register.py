@@ -1,10 +1,10 @@
 import pytest
 
-from tests.fixtures.register_user import RegisteredUser
+from tests.fixtures.register_user import RegisterResult
 
 
 @pytest.mark.anyio
-async def test_register(register_user: RegisteredUser):
+async def test_register(register_user: RegisterResult):
     to_assert_data = register_user.provided_data.dict().copy()
     del to_assert_data['password']
 

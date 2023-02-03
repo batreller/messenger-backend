@@ -1,6 +1,6 @@
 from fastapi import Depends
 
-from package.auth import auth_injector
+from package.auth import auth_id
 from package.db.models.User import User
 from package.routes.user.inputs.BioInput import BioInput
 from package.shared.SuccessResponse import SuccessResponse
@@ -8,8 +8,10 @@ from package.shared.SuccessResponse import SuccessResponse
 
 async def bio(
     data: BioInput,
-    user: User = Depends(auth_injector)
+    user_id: int = Depends(auth_id)
 ) -> SuccessResponse:
-    user.update_from_dict(data.dict())
+    updated_count = await User.filter(id=user_id).update(**data.dict())
 
-    return SuccessResponse()
+    return SuccessResponse(
+        success=updated_count >= 1
+    )

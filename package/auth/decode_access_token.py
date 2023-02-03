@@ -1,7 +1,7 @@
 from jose import JWTError, jwt
 from pydantic import BaseModel
 
-from package.auth import credentials_exception
+from package.auth.exceptions import credentials_exception
 from package.config import config
 
 
