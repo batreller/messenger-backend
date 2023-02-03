@@ -1,5 +1,5 @@
+import json
 from datetime import datetime
-from typing import Any
 
 from fastapi import Depends, Query
 from pydantic import BaseModel
@@ -11,34 +11,19 @@ from package.db.models.User import User
 
 
 class ChatsPage(BaseModel):
+    next: datetime | None
     count: int
     chats: list[PublicChat]
 
 
-def parse_public_chat(data: dict[str, Any]) -> PublicChat:
-    parse_message = data.get('message_id', None) is not None
-    values: dict[str, Any] = {
-        "last_message": {} if parse_message else None
-    }
-
-    for key, value in data.items():
-        if key.startswith('message'):
-            if not parse_message:
-                continue
-
-            values['last_message'][key.partition('_')[2]] = value
-            continue
-
-        values[key] = value
-
-    return PublicChat.construct(**values)
-
-
 async def chats(
     user: User = Depends(auth_injector),
-    time_cursor: datetime = Query(default=datetime.now(), alias='cursor'),
+    time_cursor: datetime | None = Query(default=None, alias='cursor'),
     limit: int = Query(default=25, lte=50)
 ) -> ChatsPage:
+    if time_cursor is None:
+        time_cursor = datetime.now()
+
     async with in_transaction() as conn:
         # * Gets chats and last messages of those chats.
         # * The chats are ordered based on the time when the last message was sent.
@@ -49,28 +34,30 @@ async def chats(
             select * from (
                 select
                     distinct on (chat.id) chat.*,
-                    message.id as message_id,
-                    message.contents as message_contents,
-                    message.created_at as message_created_at,
-                    message.updated_at as message_updated_at,
-                    message.author_id as message_author_id
+                    to_json(message) as last_message,
+                    coalesce(message.created_at, chat.updated_at) as last_interacted
                 from chat
-                left join message on chat.id=message.chat_id
-                left join chat_participant on chat.id=chat_participant.chat_id
-                where chat_participant.user_id=$1 and (
-                    message.created_at < $2 or message.id is null
-                )
-                order by chat.id, message.created_at desc
-                limit $3
-            ) t
-            order by t.message_created_at desc nulls last;
+                left join message on message.chat_id = chat.id
+                join chat_participant cp on cp.chat_id = chat.id and cp.user_id = $1
+                where coalesce(message.created_at, chat.updated_at) < $2
+            ) as nested
+            order by nested.last_interacted desc
+            limit $3;
         ''', [user.id, time_cursor, limit])
 
     chats = []
     for chat in map(dict, chats_data):
-        chats.append(parse_public_chat(chat))
+        if chat['last_message'] is not None:
+            chat['last_message'] = json.loads(chat['last_message'])
+
+        chats.append(PublicChat.construct(**chat))
+
+    next_cursor = None
+    if len(chats) > 0:
+        next_cursor = dict(chats_data[-1]).get('last_interacted', None)
 
     return ChatsPage(
+        next=next_cursor,
         count=count,
-        chats=chats
+        chats=chats,
     )
