@@ -1,3 +1,5 @@
+import os
+from pathlib import Path
 from urllib.parse import urlparse
 
 import asyncpg
@@ -12,9 +14,10 @@ from package.db import TORTOISE_ORM
 pytest_plugins = [
     'tests.fixtures.register_user',
     'tests.fixtures.login_user',
-    'tests.fixtures.auth_client'
+    'tests.fixtures.auth_client',
+    'tests.test_message.fixtures.chat',
+    'tests.test_message.fixtures.messages'
 ]
-
 
 async def create_db(db_url: str):
     data = urlparse(db_url)

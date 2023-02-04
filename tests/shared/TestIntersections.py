@@ -9,10 +9,12 @@ class WithId(TypedDict):
 ToCompare = TypeVar('ToCompare', bound=WithId)
 
 class TestIntersections(Generic[ToCompare], TestCase):
-    def __init__(self, omitted_fields: set[str] = set()) -> None:
+    def __init__(self, omitted_fields: set[str] | None = None) -> None:
         super().__init__()
 
-        self.omitted = set(omitted_fields)
+        self.omitted = set(['created_at', 'updated_at'])
+        if omitted_fields is not None:
+            self.omitted = self.omitted.union(omitted_fields)
 
 
     def assert_dicts(
