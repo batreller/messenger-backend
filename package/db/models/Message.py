@@ -1,13 +1,12 @@
 import typing
 
-from pydantic import BaseModel
 from tortoise import fields
 from tortoise.models import Model
 from tortoise.queryset import QuerySet
 
 from package.db.BasePublicModel import BasePublicModel
-from package.db.models.User import ShortPublicUser
 from package.db.models.mixins.Timestamp import TimestampMixin
+from package.db.models.User import ShortPublicUser
 from package.db.PublicBase import PublicBase
 
 if typing.TYPE_CHECKING:
