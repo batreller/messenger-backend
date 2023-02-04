@@ -11,4 +11,4 @@ async def test_me(auth_client: AuthClient):
     body = response.json()
 
     this_user = await get_current_user(auth_client.token)
-    TestIntersections(set(['created_at', 'updated_at'])).assert_dicts(body, dict(this_user))
+    TestIntersections().assert_dicts(body, dict(this_user))

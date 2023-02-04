@@ -12,7 +12,7 @@ async def message_author_of(
 ) -> Message:
     predicate = await Message.get_or_none(
         id=message_id
-    )
+    ).prefetch_related('author')
 
     if predicate is None:
         raise message_does_not_exist
@@ -21,4 +21,3 @@ async def message_author_of(
         raise not_the_owner
 
     return predicate
-
