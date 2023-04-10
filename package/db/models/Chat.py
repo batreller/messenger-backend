@@ -21,7 +21,7 @@ class ChatType(str, Enum):
 
 
 class PublicChat(PublicBase):
-    name: str
+    name: str | None
     type: ChatType
     last_message: PublicMessage | None
 

@@ -1,6 +1,6 @@
 import typing
 
-from tortoise import fields
+from tortoise import fields, signals
 from tortoise.models import Model
 from tortoise.queryset import QuerySet
 
@@ -25,9 +25,8 @@ class PublicMessageWithAuthor(BasePublicMessage):
     author: ShortPublicUser
 
 
-# TODO: I think it's a good idea to setup a compond key for the chat_id and the id. The only problem is to setup the autoicrement to increment only when needed
 class Message(Model, BasePublicModel[PublicMessage], TimestampMixin):
-    id = fields.IntField(pk=True)
+    id = fields.IntField(pk=True, generated=False)
     contents = fields.CharField(max_length=2047)
 
     chat_id: int
@@ -43,12 +42,14 @@ class Message(Model, BasePublicModel[PublicMessage], TimestampMixin):
 
 
     class Meta:
-        unique_together = ('id', 'chat_id')
+        # ! doesn't seem to work as a composite key. id is still the primary key in the db.
+        unique_together = ('author_id', 'chat_id')
 
 
     async def public(self) -> PublicMessage:
         data = dict(self)
         return PublicMessage.construct(**data)
+
 
     async def public_with_author(self) -> PublicMessageWithAuthor:
         if isinstance(self.author, QuerySet):
@@ -60,3 +61,22 @@ class Message(Model, BasePublicModel[PublicMessage], TimestampMixin):
         }
 
         return PublicMessageWithAuthor.construct(**data)
+
+
+@signals.pre_save(Message)
+async def signal_pre_save(
+    sender: typing.Type[Message],
+    instance: Message,
+    *_
+) -> None:
+    prev_message = await sender.filter(
+        author_id=instance.author_id,
+        chat_id=instance.chat_id
+    ).order_by('-id').first()
+
+    if prev_message is None:
+        instance.id = 0
+        return
+
+    instance.id = prev_message.id + 1
+    print(dict(prev_message))

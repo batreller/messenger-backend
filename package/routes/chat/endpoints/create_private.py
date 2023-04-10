@@ -35,7 +35,8 @@ async def create_private(
         raise chat_exists
 
     new_chat = await Chat.create(
-        type=ChatType.private
+        type=ChatType.private,
+        creator_id=user.id
     )
 
     await new_chat.participants.add(
