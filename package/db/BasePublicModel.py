@@ -8,5 +8,5 @@ Public = TypeVar('Public', bound=BaseModel)
 
 class BasePublicModel(Generic[Public]):
     @abstractmethod
-    async def public() -> Public:
+    async def public(self) -> Public:
         ...

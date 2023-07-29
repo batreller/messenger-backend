@@ -26,7 +26,7 @@ class PublicMessageWithAuthor(BasePublicMessage):
 
 
 class Message(Model, BasePublicModel[PublicMessage], TimestampMixin):
-    id = fields.IntField(pk=True, generated=False)
+    id = fields.IntField(pk=True, generated=True)
     contents = fields.CharField(max_length=2047)
 
     chat_id: int
@@ -41,9 +41,9 @@ class Message(Model, BasePublicModel[PublicMessage], TimestampMixin):
     )
 
 
-    class Meta:
-        # ! doesn't seem to work as a composite key. id is still the primary key in the db.
-        unique_together = ('author_id', 'chat_id')
+    # class Meta:
+    #     # ! doesn't seem to work as a composite key. id is still the primary key in the db.
+    #     unique_together = ('author_id', 'chat_id')
 
 
     async def public(self) -> PublicMessage:
